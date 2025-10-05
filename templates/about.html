@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>About Us - Seminario Weather</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div style="max-width:900px;margin:24px auto;">
+      <h6>About Us</h6>
+      <p class="about-description" aria-hidden="true"></p>
+
+      <p class="result-empty" style="margin-top:18px;color:var(--muted);">We are Juan Pablo, Tiziano, Ignacio, and Juan Sebastián a group of friends that like technology. We’re taking part in the NASA Hackathon, and our project is to build a website capable of forecasting weather months in advance.</p>
+
+      <p class="result-empty" style="margin-top:18px;color:var(--muted);">To do this, we are using past years' data with an algorithm that compares weather patterns to try to predict it. The idea is that our website can help plan things with the weather under control, without surprises.</p>
+
+      <section id="team" class="team" style="margin-top:18px;">
+        <h3>Team</h3>
+        <p class="result-empty">Juan Pablo · Tiziano · Ignacio · Juan Sebastián</p>
+      </section>
+
+      <p style="margin-top:22px;"><a class="back-button" href="index.html" aria-label="Go back to home">← BACK</a></p>
+    </div>
+  </div>
+</body>
+</html>
