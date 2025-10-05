@@ -7,16 +7,28 @@ from sklearn.ensemble import RandomForestRegressor
 
 app = Flask(__name__)
 
+@app.route('/about.html')
+def about():
+    return render_template('about.html')
+
+@app.route('/index.html')
+def index2():
+    return render_template('index.html')
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/submit', methods=['POST'])
-def submit():
-    LAT = float(request.form["LAT"])
-    LON = float(request.form["LON"])
-    DATE = str(request.form["DATE"])
+@app.route('/weather', methods=['POST'])
+def get_weather():
+
+    LAT = float(request.form["lat"])
+    LON = float(request.form["lon"])
+    DATE = str(request.form["date"])
     print(f"LAT={LAT}, LON={LON}, DATE={DATE}")
+
+    print(f"Received from JS -> LAT: {LAT}, LON: {LON}, DATE: {DATE}")
 
     # Parameters
     DATE_COL = "date"
@@ -93,7 +105,7 @@ def submit():
             hum = float(row[HUM_COL]) if HUM_COL in df.columns else None
             precip = float(row[RAIN_COL]) if pd.notna(row[RAIN_COL]) else None
             clima_general = "rainy" if precip and precip >= RAIN_DAY_THRESHOLD else "dry"
-            return {"date": str(target_date.date()), "temperature": temp, "humidity": hum, 
+            return {"DATE": str(target_date.date()), "temperature": temp, "humidity": hum, 
                     "precipitation_mm": precip, "general_weather": clima_general, "source": "real"}
 
         # 2) Compute features using past years
@@ -115,7 +127,7 @@ def submit():
         temp = feats.get("tmean_mean") or (feats.get("tmax_mean") + feats.get("tmin_mean"))/2 if "tmax_mean" in feats else None
         hum = feats.get("rh_mean")
 
-        return {"fecha": str(target_date.date()), "LAT": LAT, "LON": LON,
+        return {"DATE": str(target_date.date()), "LAT": LAT, "LON": LON,
                 "temperature": temp, "humidity": hum, 
                 "precipitation_mm": y_pred, "general_weather": clima_general, "source": "prediction"}
 
