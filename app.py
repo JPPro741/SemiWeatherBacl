@@ -4,6 +4,9 @@ import pandas as pd
 from datetime import datetime, timedelta
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
+from geopy.geocoders import Nominatim
+
+geolocator = Nominatim(user_agent="my_weather_app_2025_contact@myemail.com")  # descriptive and unique
 
 app = Flask(__name__)
 
@@ -23,8 +26,17 @@ def index():
 @app.route('/weather', methods=['POST'])
 def get_weather():
 
-    LAT = float(request.form["lat"])
-    LON = float(request.form["lon"])
+    address = str(request.form["location"])
+    location = geolocator.geocode(address)
+
+    if location:
+        LAT = location.latitude
+        LON = location.longitude
+        print("Latitude:", location.latitude)
+        print("Longitude:", location.longitude)
+    else:
+        print("Address not found")
+    
     DATE = str(request.form["date"])
     print(f"LAT={LAT}, LON={LON}, DATE={DATE}")
 
