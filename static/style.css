@@ -1,0 +1,156 @@
+/* 
+ * Copyright (c) 2025 JPPro741
+ * FOR MORE INFO SEE THE LICENSE FILE  
+*/
+:root {
+  --bg-gradient-day: linear-gradient(135deg, #e7fe89ff, #e86b11ff);
+  --bg-gradient-default: linear-gradient(135deg, #89f7fe, #66a6ff);
+  --bg-gradient-night: linear-gradient(135deg, #232526, #362ac4ff);
+  --card-bg: #ffffffee;
+  --muted: #6b7280;
+  --accent-1: #66a6ff;
+  --accent-2: #5a86f1;
+  --danger: #e53737;
+  --glass: rgba(255,255,255,0.6);
+  --radius: 14px;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(255,255,255,0.06), transparent), var(--bg-gradient-default);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  transition: background 0.6s ease-in-out;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #0f172a;
+}
+
+/* Main card */
+.container {
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.6));
+  padding: 36px 44px;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(12, 38, 62, 0.22);
+  max-width: 1100px;
+  width: min(96%, 1200px);
+  text-align: left;
+  animation: fadeIn 0.45s ease-in-out;
+  backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(255,255,255,0.6);
+}
+
+h1 { margin: 0 0 12px 0; font-size: 2.6rem; letter-spacing: -0.02em; color: #0b1220; }
+
+/* Two-column layout */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.controls { padding: 6px 6px 6px 10px; }
+.preview { padding: 6px 6px 6px 10px; }
+
+label { display: block; margin: 8px 0 6px; font-weight: 600; color: #334155; text-align: left; }
+
+input, select {
+  padding: 12px 14px;
+  width: 100%;
+  margin: 8px 0 14px 0;
+  border: 1px solid rgba(11, 20, 34, 0.06);
+  border-radius: 12px;
+  font-size: 16px;
+  text-align: left;
+  transition: border 0.18s ease, box-shadow 0.18s ease, transform 0.12s;
+  display: block;
+  background: rgba(255,255,255,0.9);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+input:focus { border-color: var(--accent-1); outline: none; box-shadow: 0 6px 18px rgba(102,166,255,0.12); }
+
+button {
+  padding: 12px 18px; border: none; border-radius: 12px; background: linear-gradient(135deg, #3b82f6, #6ea8ff);
+  color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.14s ease, box-shadow 0.14s ease;
+  margin-top: 6px; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px rgba(59,130,246,0.12);
+}
+
+button:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(59,130,246,0.14); }
+button:active { transform: translateY(-1px) scale(0.998); }
+
+/* Result preview area: reserve space so below the button remains blank until results */
+#result {
+  margin-top: 0; padding: 22px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(248,250,252,0.98), rgba(243,246,250,0.95));
+  box-shadow: 0 8px 28px rgba(12, 38, 62, 0.06); text-align: left; font-size: 15px; color: #0f172a;
+  animation: fadeIn2 0.35s ease-in-out; min-height: 320px; display: flex; flex-direction: column; justify-content: center;
+}
+
+.result-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; margin: 6px 0; }
+.result-label { color: var(--muted); }
+.result-value { font-weight: 700; }
+
+.result-empty { color: var(--muted); text-align: center; }
+
+.spinner { width: 44px; height: 44px; border-radius: 50%; border: 5px solid rgba(255,255,255,0.25); border-top-color: var(--accent-1); animation: spin 1s linear infinite; margin: 6px auto; }
+
+#result h3 { font-size: 20px; color: var(--danger); margin: 0 0 8px 0; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn2 { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Floating lamp button */
+#lamp-container {
+  position: fixed; top: 18px; right: 18px; font-size: 1.25rem; cursor: pointer; z-index: 1000;
+  display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: white; text-decoration: none; box-shadow: 0 10px 26px rgba(45,96,255,0.14);
+}
+#lamp-container:focus { outline: 3px solid rgba(102,166,255,0.22); outline-offset: 3px; }
+
+/* Hide legacy modal styles (about-us) if present */
+#about-us, #about-us.show, #about-us button { display: none !important; }
+
+/* Responsive */
+@media (max-width: 980px) { .grid { grid-template-columns: 1fr; } .container { padding: 22px; } #lamp-container { right: 12px; top: 12px; width: 40px; height: 40px; font-size: 1rem; } }
+@media (max-width: 520px) { .container { padding: 18px; } input, select { width: 100%; } }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; } }
+
+/* Lamp fade/hide utility */
+.lamp-fade-out {
+  transition: opacity 360ms ease-in-out, transform 360ms ease-in-out;
+  opacity: 0 !important;
+  transform: scale(0.92) translateY(-6px) !important;
+  pointer-events: none !important;
+}
+
+/* Back button (used on about.html) */
+.back-button {
+  display: inline-block;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #3b82f6, #6ea8ff);
+  color: #fff; border-radius: 10px; text-decoration: none; font-weight:700;
+}
+.back-button:hover { transform: translateY(-2px); }
+
+.team {
+    display: flex;             /* enable Flexbox */
+    flex-direction: column;    /* stack children vertically */
+    justify-content: center;   /* vertical alignment inside parent (if parent has height) */
+    align-items: center;       /* horizontal alignment */
+    text-align: center;        /* center text inside children */
+    margin-top: 18px;          /* keep your current top margin */
+}
+h6 {
+    display: flex;             /* enable Flexbox */
+    flex-direction: column;    /* stack children vertically */
+    justify-content: center;   /* vertical alignment inside parent (if parent has height) */
+    align-items: center;       
+    text-align: center; 
+    margin-bottom: 5px;      
+    margin-top: 12px; 
+    font-size: 40px;         
+}
