@@ -25,27 +25,28 @@ def index():
 
 @app.route('/weather', methods=['POST'])
 def get_weather():
+    address = str(request.form.get("location", "")).strip()
+    DATE = str(request.form.get("date", "")).strip()
 
-    address = str(request.form["location"])
-    location = geolocator.geocode(address)
+    if not address or not DATE:
+        return jsonify({"error": "Both location and date are required"}), 400
 
-    if location:
-        LAT = location.latitude
-        LON = location.longitude
-        print("Latitude:", location.latitude)
-        print("Longitude:", location.longitude)
-    else:
-        print("Address not found")
-    
-    DATE = str(request.form["date"])
-    print(f"LAT={LAT}, LON={LON}, DATE={DATE}")
+    # Geocode safely
+    try:
+        location = geolocator.geocode(address, timeout=10)
+        if not location:
+            return jsonify({"error": "Address not found"}), 400
+        LAT, LON = location.latitude, location.longitude
+        print(f"Latitude: {LAT}, Longitude: {LON}")
+    except Exception as e:
+        return jsonify({"error": f"Geocoding failed: {str(e)}"}), 500
 
     print(f"Received from JS -> LAT: {LAT}, LON: {LON}, DATE: {DATE}")
 
     # Parameters
     DATE_COL = "date"
     RAIN_COL = "precip_mm"
-    TEMP_COL = "tmean"  # if exists
+    TEMP_COL = "tmean"
     HUM_COL = "rh"
     RAIN_DAY_THRESHOLD = 1.0
     EXTRA_VARS = ["tmax", "tmin", "rh"]
@@ -63,26 +64,29 @@ def get_weather():
         "&community=AG&format=JSON"
     )
 
-    r = requests.get(BASE_URL)
-    r.raise_for_status()
-    data = r.json()
+    try:
+        r = requests.get(BASE_URL)
+        r.raise_for_status()
+        data = r.json()
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch NASA POWER data: {str(e)}"}), 500
 
-    # Process data into a DataFrame (in memory)
-    records = []
-    dates = data["properties"]["parameter"]["T2M_MAX"].keys()
-    for d in dates:
-        record = {
-            "date": pd.to_datetime(d).strftime("%Y-%m-%d"),
-            "tmax": data["properties"]["parameter"]["T2M_MAX"].get(d),
-            "tmin": data["properties"]["parameter"]["T2M_MIN"].get(d),
-            "rh": data["properties"]["parameter"]["RH2M"].get(d),
-            "wind": data["properties"]["parameter"]["WS2M"].get(d),
-            "precip_mm": data["properties"]["parameter"]["PRECTOTCORR"].get(d)
-        }
-        records.append(record)
-
-    df = pd.DataFrame(records)
-    df = df.sort_values("date")  # keep chronological order
+    # Process data into DataFrame
+    try:
+        records = []
+        dates = data["properties"]["parameter"]["T2M_MAX"].keys()
+        for d in dates:
+            records.append({
+                "date": pd.to_datetime(d).strftime("%Y-%m-%d"),
+                "tmax": data["properties"]["parameter"]["T2M_MAX"].get(d),
+                "tmin": data["properties"]["parameter"]["T2M_MIN"].get(d),
+                "rh": data["properties"]["parameter"]["RH2M"].get(d),
+                "wind": data["properties"]["parameter"]["WS2M"].get(d),
+                "precip_mm": data["properties"]["parameter"]["PRECTOTCORR"].get(d)
+            })
+        df = pd.DataFrame(records).sort_values("date")
+    except Exception as e:
+        return jsonify({"error": f"Failed to process data: {str(e)}"}), 500
 
     # Helper functions
     def md_tuple(dt):
@@ -105,10 +109,9 @@ def get_weather():
 
     def predict_for_day(df, date_str, history_years=15):
         df[DATE_COL] = pd.to_datetime(df[DATE_COL])
-        df["year"] = df[DATE_COL].dt.year
         target_date = pd.to_datetime(date_str)
 
-        # 1) Check if day exists in data
+        # Check if real data exists
         df_day = df[df[DATE_COL] == target_date]
         if not df_day.empty:
             row = df_day.iloc[0]
@@ -120,12 +123,11 @@ def get_weather():
             return {"DATE": str(target_date.date()), "temperature": temp, "humidity": hum, 
                     "precipitation_mm": precip, "general_weather": clima_general, "source": "real"}
 
-        # 2) Compute features using past years
+        # Predict using past years
         start_md = md_tuple(target_date)
         past_years = df[(df[DATE_COL].dt.month == start_md[0]) & (df[DATE_COL].dt.day == start_md[1])]
         feats = window_stats(past_years)
 
-        # 3) Train model to predict precipitation
         if len(past_years) >= 3:
             X = np.arange(len(past_years)).reshape(-1,1)
             y = past_years[RAIN_COL].fillna(0.0).values
@@ -133,22 +135,22 @@ def get_weather():
             model.fit(X, y)
             y_pred = float(model.predict(np.array([[len(past_years)]])))
         else:
-            y_pred = feats["mean_mm"]  # fallback
+            y_pred = feats["mean_mm"]
 
         clima_general = "rainy" if y_pred >= RAIN_DAY_THRESHOLD else "dry"
-        temp = feats.get("tmean_mean") or (feats.get("tmax_mean") + feats.get("tmin_mean"))/2 if "tmax_mean" in feats else None
+        temp = feats.get("tmean_mean") or (feats.get("tmax_mean",0) + feats.get("tmin_mean",0))/2
         hum = feats.get("rh_mean")
 
         return {"DATE": str(target_date.date()), "LAT": LAT, "LON": LON,
                 "temperature": temp, "humidity": hum, 
                 "precipitation_mm": y_pred, "general_weather": clima_general, "source": "prediction"}
 
-    # =========================
     # Predict for requested date
     summary = predict_for_day(df, DATE)
     print(summary)
 
     return jsonify(summary)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
