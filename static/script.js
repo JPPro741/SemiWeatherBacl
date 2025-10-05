@@ -1,6 +1,5 @@
 document.getElementById("getWeatherBtn").addEventListener("click", () => {
-    const lat = document.getElementById("lat").value;
-    const lon = document.getElementById("lon").value;
+    const location = document.getElementById("location").value;
     const date = document.getElementById("datetime").value;
     const resultDiv = document.getElementById("result");
     resultDiv.innerHTML = `We are processing your request`
@@ -14,7 +13,7 @@ document.getElementById("getWeatherBtn").addEventListener("click", () => {
     fetch("/weather", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&date=${encodeURIComponent(date)}`
+        body: `location=${encodeURIComponent(location)}&date=${encodeURIComponent(date)}`
     })
     .then(response => response.json())
     .then(data => {
