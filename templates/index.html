@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seminario Weather</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+  <div class="container">
+    <div class="grid">
+
+      <section class="controls">
+        <h1>🌤️ Seminario Weather</h1>
+
+        <label for="lat">Latitude</label>
+        <input type="number" id="lat" step="0.01" placeholder="e.g. -34.9">
+
+        <label for="lon">Longitude</label>
+        <input type="number" id="lon" step="0.01" placeholder="e.g. -56.2">
+
+        <label for="datetime">Date</label>
+        <input type="date" id="datetime">
+
+        <div class="actions">
+          <button id="getWeatherBtn">Get climate</button>
+        </div>
+      </section>
+
+      <aside class="preview">
+        <div id="result" aria-live="polite">
+          <p class="result-empty">Results will appear here</p>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <a id="lamp-container" href="about.html" aria-label="Sobre Nosotros" role="button" tabindex="0">💡</a>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="script.js"></script>
+</body>
+</html>
