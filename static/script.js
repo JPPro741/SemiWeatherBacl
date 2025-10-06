@@ -22,9 +22,9 @@ document.getElementById("getWeatherBtn").addEventListener("click", () => {
                 <p><strong>Latitude:</strong> ${data.LAT}</p>
                 <p><strong>Longitude:</strong> ${data.LON}</p>
                 <p><strong>Date:</strong> ${data.DATE}</p>
-                <p><strong>Estimated Temperature:</strong> ${data.temperature}°C</p>
-                <p><strong>Estimated Humidity:</strong> ${data.humidity}%</p>
-                <p><strong>Estimated Precipitation:</strong> ${data.precipitation_mm} mm</p>
+                <p><strong>Estimated Temperature:</strong> ${Number(data.temperature).toFixed(1)}°C</p>
+                <p><strong>Estimated Humidity:</strong> ${Number(data.humidity).toFixed(1)}%</p>
+                <p><strong>Estimated Precipitation:</strong> ${Number(data.precipitation_mm).toFixed(2)} mm</p>
                 <p><strong>General Weather:</strong> ${data.general_weather}</p>
                 <p><strong>Source:</strong> ${data.source}</p>
             `;
