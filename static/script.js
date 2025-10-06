@@ -4,7 +4,7 @@ document.getElementById("getWeatherBtn").addEventListener("click", () => {
     const resultDiv = document.getElementById("result");
     resultDiv.innerHTML = `We are processing your request`
 
-    if (!lat || !lon || !date) {
+    if (!location || !date) {
         resultDiv.innerHTML = `<p style="color:red;">Please fill in all fields.</p>`;
         return;
     }
